@@ -6,4 +6,3 @@ reactivex==4.0.4
 six==1.16.0
 smbus==1.1.post2
 typing-extensions==4.11.0
-urllib3==2.2.1
