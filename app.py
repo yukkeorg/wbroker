@@ -44,14 +44,16 @@ class Bme280Sensor:
         bme280_i2c.set_default_bus(I2C_BUS)
         bme280.setup()
 
-    def mesurement(self):
+    def measure(self):
         with lock:
             self.data = bme280.read_all()
 
-    def get_tupple(self):
-        return (self.data.temperature,
-                self.data.humidity,
-                self.data.pressure)
+    def get_dict(self):
+        return {
+            "temperature": self.data.temperature,
+            "humidity": self.data.humidity,
+            "pressure": self.data.pressure
+        }
 
 
 class MesurementThread(threading.Thread):
@@ -63,11 +65,9 @@ class MesurementThread(threading.Thread):
         self.writer = InfluxWriter()
 
     def run(self):
-        tags = ["temperature", "humidity", "pressure"]
         while True:
-            self.sensor.mesurement()
-            values = dict(zip(tags, self.sensor.get_tupple()))
-            self.writer.write("measurement", values)
+            self.sensor.measure()
+            self.writer.write("measurement", self.sensor.get_dict())
             time.sleep(10)
 
 
