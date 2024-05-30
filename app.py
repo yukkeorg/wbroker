@@ -3,6 +3,7 @@ import threading
 import time
 import signal
 import logging
+from datetime import datetime
 
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -71,8 +72,13 @@ class SO1602ADisplay:
     def return_home(self):
         self.__send_command(0x02)
 
-    def return_home2(self):
+    def return_home_fast(self):
         self.__send_command(0x80)
+
+    return_first_line = return_home_fast
+
+    def return_second_line(self):
+        self.__send_command(0xa0)
 
 
 class Bme280Sensor:
@@ -120,14 +126,22 @@ def display_thread(e, data):
         if e.is_set():
             break
 
+        display.return_first_line()
+        display.put(
+            datetime.now().strftime("%Y/%m/%d %H:%M")
+        )
+        display.return_second_line()
+
         if data:
-            display.return_home2()
             display.put(
-                f"{data['temperature']:2.0f}C "
-                f"{data['humidity']:2.0f}% "
-                f"{data['pressure']:4.0f}hPa"
+                f"{data['temperature']:2.1f}C "
+                f"{data['humidity']:2.1f}% "
+                f"{data['pressure']:4.0f}"
             )
-        time.sleep(5)
+        else:
+            display.put("--.-C --.-% ----")
+
+        time.sleep(2)
 
 
 def send_data_thread(e, data):
