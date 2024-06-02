@@ -107,13 +107,13 @@ def measurement_thread(e, data):
     sensor = Bme280Sensor()
     sensor.setup()
 
-    while True:
-        if e.is_set():
-            break
-
+    while not e.is_set():
         sensor.measure()
         with lock:
             data.update(sensor.get_dict())
+
+        if e.is_set():
+            break
 
         time.sleep(1)
 
@@ -122,10 +122,7 @@ def display_thread(e, data):
     display = SO1602ADisplay()
     display.setup()
 
-    while True:
-        if e.is_set():
-            break
-
+    while not e.is_set():
         display.return_first_line()
         display.put(
             datetime.now().strftime("%Y/%m/%d %H:%M")
@@ -141,34 +138,38 @@ def display_thread(e, data):
         else:
             display.put("--.-C --.-% ----")
 
+        if e.is_set():
+            break
+
         time.sleep(2)
 
 
 def send_data_thread(e, data):
     writer = InfluxWriter()
 
-    while True:
+    while not e.is_set():
+        writer.write("measurement", data)
+
         if e.is_set():
             break
 
-        writer.write("measurement", data)
         time.sleep(10)
 
 
-def main():
+def control_thread():
     e = threading.Event()
     data = {}
     threads = [
-        threading.Thread(target=measurement_thread, args=(e, data), daemon=True),
-        threading.Thread(target=display_thread, args=(e, data), daemon=True),
-        threading.Thread(target=send_data_thread, args=(e, data), daemon=True),
+        threading.Thread(target=measurement_thread, args=(e, data)),
+        threading.Thread(target=display_thread, args=(e, data)),
+        threading.Thread(target=send_data_thread, args=(e, data)),
     ]
 
-    def signal_handler(signum, frame):
+    def signal_sigint_handler(signum, frame):
         e.set()
         logging.info("Exiting...")
 
-    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, signal_sigint_handler)
 
     for t in threads:
         t.start()
@@ -177,5 +178,10 @@ def main():
         t.join()
 
 
+def main():
+    control_thread()
+
+
 if __name__ == '__main__':
     main()
+
