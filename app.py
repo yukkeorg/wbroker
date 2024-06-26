@@ -103,6 +103,11 @@ class Bme280Sensor:
         }
 
 
+def calc_tdi(temperature: float, humidity: float) -> float:
+    tdi = 0.81 * temperature + 0.01 * humidity * (0.99 * temperature - 14.3) + 46.3
+    return tdi
+
+
 def measurement_thread(e, data):
     sensor = Bme280Sensor()
     sensor.setup()
@@ -130,10 +135,11 @@ def display_thread(e, data):
         display.return_second_line()
 
         if data:
+            tdi = calc_tdi(data['temperature'], data['humidity'])
             display.put(
                 f"{data['temperature']:2.1f}C "
                 f"{data['humidity']:2.1f}% "
-                f"{data['pressure']:4.0f}"
+                f"{tdi:4.0f}"
             )
         else:
             display.put("--.-C --.-% ----")
