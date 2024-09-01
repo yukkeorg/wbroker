@@ -1,0 +1,39 @@
+[project]
+name = "wbroker"
+version = "0.1.0"
+description = "Add your description here"
+authors = [ { name = "Ohshima Yusuke", email = "ohshima.yusuke@yukke.org" } ]
+dependencies = [
+    "bme280~=0.7",
+    "certifi~=2024.2.2",
+    "influxdb-client~=1.42.0",
+    "python-dateutil~=2.9.0.post0",
+    "reactivex~=4.0.4",
+    "six~=1.16.0",
+    "smbus~=1.1.post2",
+    "typing-extensions~=4.11.0",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[project.scripts]
+wbroker = "wbroker.app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "ruff>=0.5.6",
+    "pytest>=8.3.2",
+    "black>=24.8.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wbroker"]
+

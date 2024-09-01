@@ -1,0 +1,11 @@
+[Unit]
+Description=wbroker
+After=network.target 
+
+[Service]
+Type=simple
+EnvironmentFile=/home/yukke/wbroker/token.env
+ExecStart=/home/yukke/wbroker/.venv/bin/python3 /home/yukke/wbroker/app.py
+
+[Install]
+WantedBy=default.target
