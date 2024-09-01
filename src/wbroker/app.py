@@ -13,7 +13,7 @@ import smbus
 from bme280 import bme280
 from bme280 import bme280_i2c
 
-SO1602A_ADDR = 0x3c
+SO1602A_ADDR = 0x3C
 BME280_ADDR = 0x76
 I2C_BUS = 1
 
@@ -78,7 +78,7 @@ class SO1602ADisplay:
     return_first_line = return_home_fast
 
     def return_second_line(self):
-        self.__send_command(0xa0)
+        self.__send_command(0xA0)
 
 
 class Bme280Sensor:
@@ -99,13 +99,12 @@ class Bme280Sensor:
         return {
             "temperature": self.data.temperature,
             "humidity": self.data.humidity,
-            "pressure": self.data.pressure
+            "pressure": self.data.pressure,
         }
 
 
 def calc_tdi(temperature: float, humidity: float) -> float:
-    tdi = 0.81 * temperature + 0.01 * humidity * (0.99 * temperature - 14.3) + 46.3
-    return tdi
+    return 0.81 * temperature + 0.01 * humidity * (0.99 * temperature - 14.3) + 46.3
 
 
 def measurement_thread(e, data):
@@ -129,13 +128,11 @@ def display_thread(e, data):
 
     while not e.is_set():
         display.return_first_line()
-        display.put(
-            datetime.now().strftime("%Y/%m/%d %H:%M")
-        )
+        display.put(datetime.now().strftime("%Y/%m/%d %H:%M"))
         display.return_second_line()
 
         if data:
-            tdi = calc_tdi(data['temperature'], data['humidity'])
+            tdi = calc_tdi(data["temperature"], data["humidity"])
             display.put(
                 f"{data['temperature']:2.1f}C "
                 f"{data['humidity']:2.1f}% "
@@ -188,6 +185,5 @@ def main():
     control_thread()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
