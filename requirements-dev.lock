@@ -22,8 +22,10 @@ influxdb-client==1.42.0
     # via wbroker
 iniconfig==2.0.0
     # via pytest
+mypy==1.11.2
 mypy-extensions==1.0.0
     # via black
+    # via mypy
 packaging==24.1
     # via black
     # via pytest
@@ -49,6 +51,7 @@ six==1.16.0
 smbus==1.1.post2
     # via wbroker
 typing-extensions==4.11.0
+    # via mypy
     # via reactivex
     # via wbroker
 urllib3==2.2.2
