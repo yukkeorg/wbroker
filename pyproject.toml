@@ -1,6 +1,6 @@
 [project]
 name = "wbroker"
-version = "0.1.0"
+version = "0.2.0"
 description = "Add your description here"
 authors = [ { name = "Ohshima Yusuke", email = "ohshima.yusuke@yukke.org" } ]
 dependencies = [
